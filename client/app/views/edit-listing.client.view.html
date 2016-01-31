@@ -1,1 +1,46 @@
 <!-- Fill in this file to create a UI view for editing listing entries. -->
+<div class="row" ng-controller="ListingsController" ng-init="findOne()">
+  <div class="col-md-offset-1 col-md-10 formWrapper">
+    <div class="page-header">
+      <h3>Edit Listing</h3>
+
+      <form name="listingForm" class="form-horizontal" ng-submit="update(listingForm.$valid)" ng-init="edited_listing = listing">
+
+        <fieldset>
+          <div class="form-group" show-errors>
+            <label for="name">Name</label>
+            <input name="name" type="text" ng-model="edited_listing.name" id="name" class="form-control" placeholder="Name" ng-init="listing.name" required>
+            <div ng-messages="listingForm.name.$error" role="alert">
+              <p class="help-block error-text" ng-message="required">Listing name is required</p>
+            </div>
+          </div>
+          <div class="form-group" show-errors>
+            <label for="code">Code</label>
+            <input name="code" type="text" ng-model="edited_listing.code" id="code" class="form-control" placeholder="Code" required>
+            <div ng-messages="listingForm.code.$error" role="alert">
+              <p class="help-block error-text" ng-message="required">Listing code is required</p>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="address">Address</label>
+            <input name="address" type="text" ng-model="edited_listing.address" id="address" class="form-control" placeholder="Address">
+          </div>
+		  <div class="form-group">
+            <label for="latitude">Latitude</label>
+            <input name="latitude" type="number" step="any" ng-model="edited_listing.coordinates.latitude" id="latitude" class="form-control" placeholder="Latitude">
+          </div>
+		  <div class="form-group">
+            <label for="longitude">Latitude</label>
+            <input name="longitude" type="number" step="any" ng-model="edited_listing.coordinates.longitude" id="longitude" class="form-control" placeholder="Longitude">
+          </div>
+          <div class="form-group">
+            <input type="submit" class="btn btn-default">
+          </div>
+          <div ng-show="error" class="text-danger">
+            <strong ng-bind="error"></strong>
+          </div>
+        </fieldset>
+      </form>
+    </div>
+  </div>
+</div>

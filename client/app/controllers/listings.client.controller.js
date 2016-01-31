@@ -3,11 +3,27 @@ angular.module('listings').controller('ListingsController', ['$scope', '$locatio
     $scope.find = function() {
       /* set loader*/
       $scope.loading = true;
+	  $scope.markers = [];
 
       /* Get all the listings, then bind it to the scope */
       Listings.getAll().then(function(response) {
         $scope.loading = false; //remove loader
         $scope.listings = response.data;
+		
+		for(var i = 0; i < $scope.listings.length; ++i){
+			if($scope.listings[i].coordinates){
+				$scope.markers.push({
+					id: i,
+					title: $scope.listings[i].name,
+					code: $scope.listings[i].code,
+					address: $scope.listings[i].address,
+					latitude: $scope.listings[i].coordinates.latitude,
+					longitude: $scope.listings[i].coordinates.longitude,
+					options: { draggable: true },
+					show: false
+				});
+			}
+		}
       }, function(error) {
         $scope.loading = false;
         $scope.error = 'Unable to retrieve listings!\n' + error;
@@ -36,7 +52,22 @@ angular.module('listings').controller('ListingsController', ['$scope', '$locatio
       Listings.read(id)
               .then(function(response) {
                 $scope.listing = response.data;
-                $scope.loading = false;
+				
+				// save a copy of the selected listing for editing
+				if($state.current.name == 'listings.edit'){
+					$scope.edited_listing = {
+						_id: $scope.listing._id,
+						__v: $scope.listing.__v,
+						name: $scope.listing.name,
+						code: $scope.listing.code,
+						address: $scope.listing.address,
+						coordinates: $scope.listing.coordinates || {latitude:"", longitude:""},
+						created_at: $scope.listing.created_at,
+						updated_at: $scope.listing.updated_at
+					};
+				}
+                
+				$scope.loading = false;
               }, function(error) {  
                 $scope.error = 'Unable to retrieve listing with id "' + id + '"\n' + error;
                 $scope.loading = false;
@@ -79,6 +110,23 @@ angular.module('listings').controller('ListingsController', ['$scope', '$locatio
         successfully finished, navigate back to the 'listing.list' state using $state.go(). If an error 
         occurs, pass it to $scope.error. 
        */
+	   $scope.loading = true;
+		if (!isValid) {
+			$scope.$broadcast('show-errors-check-validity', 'articleForm');
+			$scope.loading = false;
+			return false;
+		}
+		
+		Listings.update($scope.edited_listing._id, $scope.edited_listing)
+				.then(function(response){
+					$scope.loading = false;
+					$state.go('listings.list', { successMessage: 'Edited listing succesfully!' });
+				}, function(error){
+					$scope.loading = false;
+					$scope.error = 'Unable to update listing!\n' + error;
+					console.log(error);
+				});
+		
     };
 
     $scope.remove = function() {
@@ -86,6 +134,17 @@ angular.module('listings').controller('ListingsController', ['$scope', '$locatio
         Implement the remove function. If the removal is successful, navigate back to 'listing.list'. Otherwise, 
         display the error. 
        */
+	  $scope.loading = true;
+	  Listings.delete($scope.listing._id)
+	  	.then(function(response){
+	  		$scope.loading = false;
+			$scope.listing = {};
+	  		$state.go('listings.list', { successMessage: 'Deleted listing succesfully!' });
+	  	}, function(error){
+	  		$scope.loading = false;
+	  		$scope.error = 'Unable to delete listing!\n' + error;
+	  		console.log(error);
+	  	});
     };
 
     /* Bind the success message to the scope if it exists as part of the current state */
@@ -101,5 +160,17 @@ angular.module('listings').controller('ListingsController', ['$scope', '$locatio
       }, 
       zoom: 14
     }
+	
+	/* 
+		Adapted from angular google maps example: 
+		http://angular-ui.github.io/angular-google-maps/#!/api/window 
+	*/
+	$scope.prev_click = {};
+	$scope.onClick = function(marker, eventName, model) {
+		$scope.prev_click.show = false;
+		model.show = !model.show;
+		$scope.prev_click = model;
+	};
+	
   }
 ]);

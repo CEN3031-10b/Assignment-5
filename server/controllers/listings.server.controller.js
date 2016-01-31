@@ -59,6 +59,10 @@ exports.update = function(req, res) {
       longitude: req.results.lng
     };
   }
+  // add ability to update lat and lng for when the google api is unable to find a match
+  else if(req.body.coordinates && req.body.coordinates.latitude && req.body.coordinates.longitude){
+	  listing.coordinates = req.body.coordinates;
+  }
 
   /* Save the article */
   listing.save(function(err) {

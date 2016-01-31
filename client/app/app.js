@@ -2,7 +2,7 @@
 angular.module('listings', []);
 
 /* register the application and inject all the necessary dependencies */
-var app = angular.module('directoryApp', ['ui.router', 'ui.bootstrap', 'uiGmapgoogle-maps', 'listings']);
+var app = angular.module('directoryApp', ['ui.router', 'ui.bootstrap', 'ngMessages', 'uiGmapgoogle-maps', 'listings']);
 
 /* application configuration */
 app.config(['$urlRouterProvider', '$locationProvider',
