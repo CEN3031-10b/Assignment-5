@@ -9,7 +9,8 @@
     https://angular-ui.github.io/angular-google-maps/#!/api/windows
   -->
   
-<div class="row" ng-controller="ListingsController" ng-init="find()">	
+<div class="row" ng-controller="ListingsController" ng-init="find()">
+	<img id="loader" ng-show="loading" src="/../../img/484.gif">	
 	<ui-gmap-google-map center="map.center" zoom="map.zoom" draggable="true">
 			<ui-gmap-markers models="markers" coords="'self'" icon="'icon'" click="onClick">
 				<ui-gmap-windows show="show">
